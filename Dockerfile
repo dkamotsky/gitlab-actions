@@ -1,15 +1,14 @@
-FROM golang:1.11-alpine as build
+FROM alpine:latest
 
-RUN apk add --no-cache gcc libc-dev git \
-    && go get -u github.com/nektos/act
+RUN apk add --no-cache bash git curl
 
-FROM alpine:3.8
-COPY --from=build /go/bin/act /usr/local/bin/act
-# bash is needed for sh -c '...' used by docker/GitLab's CMD
-# git is are needed by act
-# not creating /github/workspace as path is /build/$CI_PROJECT_NAME
-RUN apk add --no-cache bash git \
-    && sed -i '1croot:x:0:0:root:/root:/bin/bash' /etc/passwd \
-    && mkdir -p /github/home /github/workflow
+#RUN apk add --no-cache bash git curl && sed -i '1croot:x:0:0:root:/root:/bin/bash' /etc/passwd
+RUN mkdir -p /github/home /github/workflow /opt/hostedtoolcache
+
+RUN curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
+
+ENV AGENT_TOOLSDIRECTORY /opt/hostedtoolcache
+
+COPY .github /github/workspace/.github
 
 WORKDIR /github/workspace
