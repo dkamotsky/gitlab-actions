@@ -2,9 +2,10 @@ version: "3"
 
 services:
   act:
-    image: dkamotsky/gitlab-actions:latest
+    image: dkamotsky/action:latest
     build:
       context: ./
+      dockerfile: Dockerfile-act
     command: sh -c 'sleep infinity'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
